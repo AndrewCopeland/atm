@@ -27,5 +27,5 @@ A file called `./atm` will appear in your current working directory to run this 
 ## Testing
 To run all tests in the suite execute the following in the project root directory:
 ```bash
-go test
+go test ./...
 ```
