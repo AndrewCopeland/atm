@@ -48,6 +48,9 @@ func (a AccountDB) read() ([]Account, error) {
 		}
 
 		columns := strings.Split(line, ",")
+		if len(columns) != 3 {
+			return []Account{}, fmt.Errorf("Invalid number of columns in the provided accounts CSV. %s", line)
+		}
 
 		// Validate all of the csv entries are appropriate types
 		accountID, err := strconv.Atoi(columns[0])
@@ -78,7 +81,7 @@ func (a AccountDB) read() ([]Account, error) {
 }
 
 func (a AccountDB) write(accounts []Account) error {
-	file, err := os.OpenFile(a.DBFile, os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(a.DBFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -89,7 +92,8 @@ func (a AccountDB) write(accounts []Account) error {
 
 	// Write each account to the file
 	for _, account := range accounts {
-		_, err = datawriter.WriteString(fmt.Sprintf("%d,%s,%.2f\n", account.AccountID, account.PIN, account.Balance))
+		line := fmt.Sprintf("%d,%s,%.2f\n", account.AccountID, account.PIN, account.Balance)
+		_, err = datawriter.WriteString(line)
 		if err != nil {
 			return err
 		}
